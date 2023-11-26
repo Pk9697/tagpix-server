@@ -2,6 +2,7 @@ import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import router from './routes/index.js'
+import './config/mongoose.js'
 
 const port = process.env.TAGPIX_PORT || 4001
 const app = express()
