@@ -158,3 +158,60 @@ export const assignLabel = async (req, res) => {
     })
   }
 }
+
+export const removeLabel = async (req, res) => {
+  try {
+    const { postId, labelId } = req.query
+    const label = await Label.findById(labelId)
+    if (!label) {
+      return res.status(422).json({
+        success: false,
+        message: "Label doesn't exist",
+      })
+    }
+    const post = await Post.findById(postId)
+    if (!post) {
+      return res.status(422).json({
+        success: false,
+        message: "Post doesn't exist",
+      })
+    }
+
+    // find if this label id already assigned to post
+    const existingLabel = post.labels.includes(labelId)
+    if (!existingLabel) {
+      return res.status(422).json({
+        success: false,
+        message: 'Label not assigned to this post',
+      })
+    }
+
+    // find if this label id already assigned to post
+    const existingPost = label.posts.includes(postId)
+    if (!existingPost) {
+      return res.status(422).json({
+        success: false,
+        message: 'Post not assigned to this label',
+      })
+    }
+    // pull out from labels array which matches labelId
+    await Post.findByIdAndUpdate(postId, {
+      $pull: { labels: labelId },
+    })
+    // pull out from posts array which matches postId
+    await Label.findByIdAndUpdate(labelId, {
+      $pull: { posts: postId },
+    })
+
+    return res.status(200).json({
+      success: true,
+      message: 'Label removed successfully',
+    })
+  } catch (err) {
+    console.log(err)
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error',
+    })
+  }
+}
