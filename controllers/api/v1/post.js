@@ -6,7 +6,9 @@ import path from 'path'
 import sharp from 'sharp'
 import Post from '../../../models/post.js'
 import Label from '../../../models/label.js'
+import fileDirName from '../../../utils/file-dir-name.js'
 
+const { __dirname } = fileDirName(import.meta)
 /* CREATE POST- requires admin authentication */
 export const createPost = async (req, res) => {
   try {
@@ -99,7 +101,7 @@ export const createPost = async (req, res) => {
   }
 }
 
-/* ASSIGN LABEL- requires authentication */
+/* ASSIGN LABEL to post- requires authentication */
 
 export const assignLabel = async (req, res) => {
   try {
@@ -159,6 +161,8 @@ export const assignLabel = async (req, res) => {
   }
 }
 
+/* REMOVE LABEL from Post- requires authentication */
+
 export const removeLabel = async (req, res) => {
   try {
     const { postId, labelId } = req.query
@@ -206,6 +210,52 @@ export const removeLabel = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: 'Label removed successfully',
+    })
+  } catch (err) {
+    console.log(err)
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error',
+    })
+  }
+}
+
+/* DELETE POST- requires admin authentication */
+
+export const deletePost = async (req, res) => {
+  try {
+    const { postId } = req.params
+    const { user } = req
+    if (!user.isAdmin) {
+      return res.status(422).json({
+        success: false,
+        message: 'You are not an admin to delete image',
+      })
+    }
+
+    const post = await Post.findById(postId)
+    if (!post) {
+      return res.status(422).json({
+        success: false,
+        message: "Post doesn't exist",
+      })
+    }
+    // Iterate on labels array and pull/remove postid from that label
+    post.labels.forEach(async (labelId) => {
+      await Label.findByIdAndUpdate(labelId, {
+        $pull: { posts: postId },
+      })
+    })
+
+    if (post.image && fs.existsSync(path.join(__dirname, '../../../', post.image))) {
+      fs.unlinkSync(path.join(__dirname, '../../../', post.image))
+    }
+
+    await Post.findByIdAndDelete(postId)
+
+    return res.status(200).json({
+      success: true,
+      message: 'Post deleted successfully',
     })
   } catch (err) {
     console.log(err)

@@ -1,7 +1,7 @@
 import express from 'express'
 import passport from 'passport'
 import '../../../config/passport-jwt-strategy.js'
-import { createPost, assignLabel, removeLabel } from '../../../controllers/api/v1/post.js'
+import { createPost, assignLabel, removeLabel, deletePost } from '../../../controllers/api/v1/post.js'
 
 const router = express.Router()
 
@@ -9,5 +9,6 @@ const router = express.Router()
 router.post('/create', passport.authenticate('jwt', { session: false }), createPost)
 router.post('/assignLabel', passport.authenticate('jwt', { session: false }), assignLabel)
 router.post('/removeLabel', passport.authenticate('jwt', { session: false }), removeLabel)
+router.delete('/delete/:postId', passport.authenticate('jwt', { session: false }), deletePost)
 
 export default router
