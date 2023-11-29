@@ -7,7 +7,7 @@ import Post from '../../../models/post.js'
 /* CREATE LABEL- requires admin authentication */
 export const createLabel = async (req, res) => {
   try {
-    const { name } = req.body
+    const { name } = req.query
     const { user } = req
 
     if (!user.isAdmin) {
@@ -78,6 +78,26 @@ export const deleteLabel = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: 'Label deleted successfully',
+    })
+  } catch (err) {
+    console.log(err)
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error',
+    })
+  }
+}
+
+/* GET ALL LABELS- requires authentication */
+export const getAllLabels = async (req, res) => {
+  try {
+    const labels = await Label.find().sort('-createdAt')
+    return res.status(200).json({
+      success: true,
+      message: 'Here are your labels',
+      data: {
+        labels,
+      },
     })
   } catch (err) {
     console.log(err)
