@@ -265,3 +265,24 @@ export const deletePost = async (req, res) => {
     })
   }
 }
+
+/* GET ALL POSTS- requires authentication */
+
+export const getAllPosts = async (req, res) => {
+  try {
+    const posts = await Post.find().sort('-createdAt').populate({ path: 'labels' })
+    return res.status(200).json({
+      success: true,
+      message: 'Here are all your Posts',
+      data: {
+        posts,
+      },
+    })
+  } catch (err) {
+    console.log(err)
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error',
+    })
+  }
+}
