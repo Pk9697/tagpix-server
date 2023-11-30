@@ -91,7 +91,7 @@ export const deleteLabel = async (req, res) => {
 /* GET ALL LABELS- requires authentication */
 export const getAllLabels = async (req, res) => {
   try {
-    const labels = await Label.find().sort('-createdAt')
+    const labels = await Label.find().sort('-createdAt').populate({ path: 'posts' })
     return res.status(200).json({
       success: true,
       message: 'Here are your labels',

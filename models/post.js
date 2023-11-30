@@ -53,7 +53,7 @@ postSchema.statics.uploadedPostImg = multer({
 }).single('image')
 
 postSchema.statics.postImgPath = POST_IMG_PATH
-// telling mongoose that this->'post' is a model in the database
-const Post = mongoose.model('post', postSchema)
+// telling mongoose that this->'Post' is a model in the database
+const Post = mongoose.model('Post', postSchema)
 // now exporting this post schema
 export default Post
