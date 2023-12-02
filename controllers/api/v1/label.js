@@ -91,12 +91,44 @@ export const deleteLabel = async (req, res) => {
 /* GET ALL LABELS- requires authentication */
 export const getAllLabels = async (req, res) => {
   try {
-    const labels = await Label.find().sort('-createdAt').populate({ path: 'posts' })
+    const labels = await Label.find()
+      .sort('-createdAt')
+      .populate({ path: 'posts', populate: { path: 'labels' } })
     return res.status(200).json({
       success: true,
       message: 'Here are your labels',
       data: {
         labels,
+      },
+    })
+  } catch (err) {
+    console.log(err)
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error',
+    })
+  }
+}
+
+/* GET ALL POSTS associated with a label- requires authentication */
+export const filterPostsByLabel = async (req, res) => {
+  try {
+    const { labelId } = req.params
+    const label = await Label.findById(labelId)
+      .sort('-createdAt')
+      .populate({ path: 'posts', populate: { path: 'labels' } })
+    if (!label) {
+      return res.status(422).json({
+        success: false,
+        message: "Label doesn't exist",
+      })
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Here are your posts filtered with this label',
+      data: {
+        posts: label.posts,
       },
     })
   } catch (err) {

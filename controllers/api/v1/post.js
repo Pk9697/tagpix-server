@@ -131,7 +131,10 @@ export const assignLabel = async (req, res) => {
     }
 
     post.labels = [label._id, ...post.labels]
-    post.save()
+    await post.save()
+
+    const labelPopulatedPost = await Post.findById(postId).populate({ path: 'labels' })
+
     // find if this label id already assigned to post
     const existingPost = label.posts.includes(postId)
     if (existingPost) {
@@ -142,13 +145,13 @@ export const assignLabel = async (req, res) => {
     }
 
     label.posts = [post._id, ...label.posts]
-    label.save()
+    await label.save()
 
     return res.status(200).json({
       success: true,
       message: 'Assigned Label successfully',
       data: {
-        post,
+        post: labelPopulatedPost,
         label,
       },
     })
@@ -270,7 +273,9 @@ export const deletePost = async (req, res) => {
 
 export const getAllPosts = async (req, res) => {
   try {
-    const posts = await Post.find().sort('-createdAt').populate({ path: 'labels' })
+    const posts = await Post.find()
+      .sort('-createdAt')
+      .populate({ path: 'labels', populate: { path: 'posts' } })
     return res.status(200).json({
       success: true,
       message: 'Here are all your Posts',
