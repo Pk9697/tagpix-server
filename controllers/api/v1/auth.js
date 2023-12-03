@@ -7,7 +7,7 @@ import env from '../../../config/environment.js'
 /* REGISTER */
 export const register = async (req, res) => {
   try {
-    const { email, password, confirmPassword, name } = req.body
+    const { email, password, confirmPassword, name, isAdmin } = req.body
     if (password !== confirmPassword) {
       return res.status(422).json({
         success: false,
@@ -26,6 +26,7 @@ export const register = async (req, res) => {
       email,
       password,
       name,
+      isAdmin,
     })
 
     const { password: pass, ...newUserWithoutPass } = newUser?._doc
