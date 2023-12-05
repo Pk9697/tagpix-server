@@ -6,7 +6,7 @@ import './config/mongoose.js'
 import fileDirName from './utils/file-dir-name.js'
 
 const { __dirname } = fileDirName(import.meta)
-const port = process.env.TAGPIX_PORT || 4001
+const port = process.env.PORT || process.env.TAGPIX_PORT || 4001
 const app = express()
 
 /* MIDDLEWARES */
